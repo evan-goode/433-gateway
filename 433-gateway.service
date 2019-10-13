@@ -1,0 +1,16 @@
+[Unit]
+Description=MQTT to 433.92MHz gateway
+Requires=network.target
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/local/bin/433-gateway
+ProtectSystem=true
+ProtectHome=true
+Restart=always
+RestartSec=1
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[mqtt]
+broker.address = "localhost"
+broker.port = 1883
+topic = "433"
+qos = 0
+
+[rf]
+gpio = 17
+pulse-length = 350
+repeat = 10
+length = 24
