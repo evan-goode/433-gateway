@@ -14,10 +14,10 @@ class Transmitter:
     def start(self, ):
         self.rfdevice.enable_tx()
     def send(self, code):
-        rfdevice.tx_code(code,
-                         "default",
-                         self.config["pulse-length"],
-                         self.config["length"])
+        self.rfdevice.tx_code(code,
+                              None,
+                              self.config["pulse-length"],
+                              self.config["length"])
     def stop(self):
         self.rfdevice.cleanup()
         
@@ -33,11 +33,12 @@ def main():
 
     def on_message(client, data, message):
         if message.topic == config["mqtt"]["topic"]:
-            print(f"received code: {message.payload}")
+            print(f"received code: {message.payload}, transmitting...")
             transmitter.send(int(message.payload))
     client.on_message = on_message
 
     client.subscribe(config["mqtt"]["topic"], config["mqtt"]["qos"])
+    print(f"subscribed to topic: {config['mqtt']['topic']}")
     client.loop_forever()
     transmitter.stop()
 
