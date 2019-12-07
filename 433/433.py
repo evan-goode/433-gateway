@@ -41,10 +41,15 @@ def main():
     def on_message(client, userdata, message):
         if message.topic == config["mqtt"]["topic"]:
             parsed = json.loads(message.payload)
-            code = parsed["code"]
+            codes = []
+            if "codes" in parsed and parsed["codes"]:
+                codes = parsed["codes"]
+            elif "code" in parsed and parsed["code"]:
+                codes.append(parsed["code"])
             pulse_length = ("pulse-length" in parsed and parsed["pulse-length"]) or config["rf"]["pulse-length"]
-            print(f"received code: {code} with pulse length {pulse_length}, transmitting...")
-            transmitter.send(code, pulse_length)
+            for code in codes:
+                print(f"received code: {code} with pulse length {pulse_length}, transmitting...")
+                transmitter.send(code, pulse_length)
 
     client = mqtt.Client()
     client.on_connect = on_connect
