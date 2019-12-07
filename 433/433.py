@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import json
+
 import paho.mqtt.client as mqtt
 from rpi_rf import RFDevice
 import toml
@@ -16,9 +18,9 @@ class Transmitter:
     def start(self,):
         self.rfdevice.enable_tx()
 
-    def send(self, code):
+    def send(self, code, pulse_length):
         self.rfdevice.tx_code(
-            code, None, self.config["pulse-length"], self.config["length"]
+            code, None, pulse_length, self.config["length"]
         )
 
     def stop(self):
@@ -38,8 +40,11 @@ def main():
 
     def on_message(client, userdata, message):
         if message.topic == config["mqtt"]["topic"]:
-            print(f"received code: {message.payload}, transmitting...")
-            transmitter.send(int(message.payload))
+            parsed = json.loads(message.payload)
+            code = parsed["code"]
+            pulse_length = ("pulse-length" in parsed and parsed["pulse-length"]) or config["rf"]["pulse-length"]
+            print(f"received code: {code} with pulse length {pulse_length}, transmitting...")
+            transmitter.send(code, pulse_length)
 
     client = mqtt.Client()
     client.on_connect = on_connect
